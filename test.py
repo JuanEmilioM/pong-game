@@ -1,5 +1,5 @@
 # Módulos
-import sys, os
+import sys
 import pygame
 from pygame.locals import *
  
@@ -9,7 +9,18 @@ HEIGHT = 480
  
 # Clases
 # ---------------------------------------------------------------------
- 
+class Ball (pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = load_image("images/ball.png", True)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH / 2
+        self.rect.centery = HEIGHT / 2
+        self.speed = [0.5, -0.5]
+
+    def get_image (self): return self.image
+
+    def get_rect (self): return self.rect
 # ---------------------------------------------------------------------
  
 # Funciones
@@ -30,16 +41,21 @@ def load_image (filename, transparent=False):
 # ---------------------------------------------------------------------
  
 def main():
+    # sets the main screen with its background image
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Test")
     background_image = load_image("images/fondo_pong.png")
     
+    # creates the pong ball
+    ball = Ball()
+
     while True:
         for event in pygame.event.get():
             if event.type == QUIT:
                 sys.exit(0)
         
         screen.blit(background_image, (0, 0))
+        screen.blit(ball.get_image(), ball.get_rect())
         pygame.display.flip()
 
     return 0
