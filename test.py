@@ -32,6 +32,7 @@ class Ball (pygame.sprite.Sprite):
     def get_image (self): return self.image
     def get_rect (self): return self.rect
     def speed_up (self, speed): self.speed = speed
+    def get_speed (self): return self.speed
 
     # updates the position of the ball on the screen
     def update (self, time, racket):
@@ -55,6 +56,7 @@ class Ball (pygame.sprite.Sprite):
             self.rect.centerx += self.speed[X] * time
 
         return False
+
 class Racket (pygame.sprite.Sprite):
     def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self)
@@ -72,12 +74,21 @@ class Racket (pygame.sprite.Sprite):
     def get_image (self): return self.image
     def get_rect (self): return self.rect
 
-    def move (self, time, keys):
-        if (self.rect.top >= 0 and keys[K_UP]):
-            self.rect.centery -= self.speed * time
-        
-        if (self.rect.bottom <= HEIGHT and keys[K_DOWN]):
-            self.rect.centery += self.speed * time
+    def move (self, time, keys=None, ball=None):
+        if (keys is not None):
+            if (self.rect.top >= 0 and keys[K_UP]):
+                self.rect.centery -= self.speed * time
+            
+            if (self.rect.bottom <= HEIGHT and keys[K_DOWN]):
+                self.rect.centery += self.speed * time
+        elif(ball is not None):
+            speed = ball.get_speed()
+            if (speed[Y] > 0):
+                self.rect.centery += self.speed * time
+            else:
+                self.rect.centery -= self.speed * time
+
+
 # ---------------------------------------------------------------------
 
 # Procedures
@@ -145,7 +156,8 @@ def main():
             lose_message(screen)
             pygame.display.flip()
         else:
-            racket_player.move(time, get_pressed())
+            racket_player.move(time, keys=get_pressed())
+            racket_cpu.move(time, ball=ball)
             screen.blit(background_image, (0, 0))
             screen.blit(ball.get_image(), ball.get_rect())
             screen.blit(racket_player.get_image(), racket_player.get_rect())
