@@ -16,19 +16,20 @@ Y = 1
 # Classes
 # ---------------------------------------------------------------------
 class Positions (enum.Enum):
-    LEFT = 0
-    RIGHT = 1
-    UP = 2
-    DOWN = 3
+    NONE = 0
+    LEFT = 1
+    RIGHT = 2
+    UP = 3
+    DOWN = 4
 
 class Ball (pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, speed=[.25, -.25]):
         pygame.sprite.Sprite.__init__(self)
         self.image = load_image("images/ball.png", True)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.centery = HEIGHT / 2
-        self.speed = [0.25, -0.25]
+        self.speed = speed
 
     def get_image (self): return self.image
     def get_rect (self): return self.rect
@@ -41,12 +42,10 @@ class Ball (pygame.sprite.Sprite):
         self.rect.centery += self.speed[Y] * time
         
         # looks for colisions with the left wall
-        if (self.rect.left <= 0):
-            return True
+        if (self.rect.left <= 0): return Positions.LEFT
         
-        if (self.rect.right >= WIDTH):
-            self.speed[X] = -self.speed[X]  # changes of x momentum component
-            self.rect.centerx += self.speed[X] * time
+        # looks for colisions with the right wall
+        if (self.rect.right >= WIDTH): return Positions.RIGHT
 
         if (self.rect.top <= 0 or self.rect.bottom >= HEIGHT):
             self.speed[Y] = -self.speed[Y]  # changes of y momentum component
@@ -56,7 +55,7 @@ class Ball (pygame.sprite.Sprite):
             self.speed[X] = -self.speed[X]
             self.rect.centerx += self.speed[X] * time
 
-        return False
+        return Positions.NONE
 
 class Racket (pygame.sprite.Sprite):
     def __init__(self, pos):
@@ -84,15 +83,15 @@ class Racket (pygame.sprite.Sprite):
                 self.rect.centery += self.speed * time
         
         elif(ball is not None):
-            speed = ball.get_speed()
+            ball_speed = ball.get_speed()
             # predicted position of the ball
-            y = ball.get_rect().centery + speed[Y] * time
-            self.rect.centery = (1 + .1)*y                        
+            y = ball.get_rect().centery + ball_speed[Y] * time
+            self.rect.centery = (1 - .1)*y
 # ---------------------------------------------------------------------
 
 # Procedures
 # ---------------------------------------------------------------------
-def lose_message (screen):
+def lose_message (screen, message):
     # sets the colors 
     white = (255, 255, 255)
     green = (0, 255, 0)
@@ -101,7 +100,7 @@ def lose_message (screen):
 
     # sets the font used to print messages 
     font = pygame.font.Font('freesansbold.ttf', 36)
-    text = font.render('You lose!', True, red, white)
+    text = font.render(message, True, red, white)
 
     # create a rectangular object for the
     # text surface object
@@ -136,7 +135,7 @@ def main():
     clock = pygame.time.Clock()
 
     # creates the pong ball
-    ball = Ball()
+    ball = Ball([.2, -.1])
 
     # creates the two rackets
     racket_player = Racket(Positions.LEFT)
@@ -153,9 +152,14 @@ def main():
         # updates the position of the sprites on the screen
         #ball.update(time, racket_cpu)
 
-        if(ball.update(time, racket_player)):
-            lose_message(screen)
+        if(ball.update(time, racket_player) == Positions.LEFT):
+            lose_message(screen, "You lose!")
             pygame.display.flip()
+
+        elif(ball.update(time, racket_cpu) == Positions.RIGHT):
+            lose_message(screen, "CPU loses!")
+            pygame.display.flip()
+            
         else:
             racket_player.move(time, keys=get_pressed())
             racket_cpu.move(time, ball=ball)
