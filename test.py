@@ -76,6 +76,25 @@ class Racket (pygame.sprite.Sprite):
 
 # Procedures
 # ---------------------------------------------------------------------
+def lose_message (screen):
+    # sets the colors 
+    white = (255, 255, 255)
+    green = (0, 255, 0)
+    blue = (0, 0, 128)
+
+    # sets the font used to print messages 
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    text = font.render('You lose!', True, green, blue)
+
+    # create a rectangular object for the
+    # text surface object
+    textRect = text.get_rect()
+ 
+    # set the center of the rectangular object.
+    textRect.center = (WIDTH/2, HEIGHT/2)
+
+    screen.blit(text, textRect)
+
 def load_image (filename, transparent=False):
     try: image = pygame.image.load(filename)
     except pygame.error:
@@ -88,7 +107,6 @@ def load_image (filename, transparent=False):
         image.set_colorkey(color, RLEACCEL)
 
     return image
-
 # ---------------------------------------------------------------------
 
 def main():
@@ -122,7 +140,7 @@ def main():
         screen.blit(ball.get_image(), ball.get_rect())
         screen.blit(racket_player.get_image(), racket_player.get_rect())
         screen.blit(racket_cpu.get_image(), racket_cpu.get_rect())
-        pygame.display.flip()
+        pygame.display.flip()       
 
     return 0
 
