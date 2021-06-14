@@ -4,6 +4,7 @@ import pygame
 from pygame.locals import *
 from pygame.key import get_pressed
 from pygame.sprite import collide_rect
+from numpy.random import uniform
 
 # Constants
 WIDTH = 640
@@ -81,14 +82,12 @@ class Racket (pygame.sprite.Sprite):
             
             if (self.rect.bottom <= HEIGHT and keys[K_DOWN]):
                 self.rect.centery += self.speed * time
+        
         elif(ball is not None):
             speed = ball.get_speed()
-            if (speed[Y] > 0):
-                self.rect.centery += self.speed * time
-            else:
-                self.rect.centery -= self.speed * time
-
-
+            y = ball.get_rect().centery + .15*speed[Y] * time
+            self.rect.centery = y
+                        
 # ---------------------------------------------------------------------
 
 # Procedures
@@ -152,6 +151,8 @@ def main():
                 sys.exit(0)
 
         # updates the position of the sprites on the screen
+        #ball.update(time, racket_cpu)
+
         if(ball.update(time, racket_player)):
             lose_message(screen)
             pygame.display.flip()
