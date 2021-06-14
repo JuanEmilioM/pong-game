@@ -87,10 +87,11 @@ def lose_message (screen):
     white = (255, 255, 255)
     green = (0, 255, 0)
     blue = (0, 0, 128)
+    red = (255, 0, 0)
 
     # sets the font used to print messages 
-    font = pygame.font.Font('freesansbold.ttf', 32)
-    text = font.render('You lose!', True, green, blue)
+    font = pygame.font.Font('freesansbold.ttf', 36)
+    text = font.render('You lose!', True, red, white)
 
     # create a rectangular object for the
     # text surface object
