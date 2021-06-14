@@ -49,6 +49,12 @@ class Ball (pygame.sprite.Sprite):
             self.speed[X] = -self.speed[X]
             self.rect.centerx += self.speed[X] * time
 
+        # looks for colisions with left wall
+        if (self.rect.left <= 0):
+            return True
+        else:
+            return False
+
 class Racket (pygame.sprite.Sprite):
     def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self)
