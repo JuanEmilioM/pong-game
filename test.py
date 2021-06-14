@@ -2,6 +2,8 @@
 import sys, enum
 import pygame
 from pygame.locals import *
+from pygame.key import get_pressed
+from pygame.sprite import collide_rect
 
 # Constants
 WIDTH = 640
@@ -31,7 +33,7 @@ class Ball (pygame.sprite.Sprite):
     def speed_up (self, speed): self.speed = speed
 
     # updates the position of the ball on the screen
-    def update (self, time):
+    def update (self, time, racket):
         self.rect.centerx += self.speed[X] * time
         self.rect.centery += self.speed[Y] * time
 
@@ -43,12 +45,16 @@ class Ball (pygame.sprite.Sprite):
             self.speed[Y] = -self.speed[Y]  # changes of y momentum component
             self.rect.centery += self.speed[Y] * time
 
+        if (collide_rect(self, racket)):
+            self.speed[X] = -self.speed[X]
+            self.rect.centerx += self.speed[X] * time
+
 class Racket (pygame.sprite.Sprite):
     def __init__(self, pos):
         pygame.sprite.Sprite.__init__(self)
         self.image = load_image("images/racket.png", True)
         self.rect = self.image.get_rect()
-        self.speed = .5
+        self.speed = .6
 
         if (pos == Positions.LEFT):
             self.rect.midleft = (0,HEIGHT/2)
@@ -104,13 +110,14 @@ def main():
     while True:
         time = clock.tick(FRAMERATE)
 
+        # checks if exit button was pressed
         for event in pygame.event.get():
             if event.type == QUIT:
                 sys.exit(0)
 
         # updates the position of the sprites on the screen
-        ball.update(time)
-        racket_player.move(time, pygame.key.get_pressed())
+        ball.update(time, racket_player)
+        racket_player.move(time, get_pressed())
         screen.blit(background_image, (0, 0))
         screen.blit(ball.get_image(), ball.get_rect())
         screen.blit(racket_player.get_image(), racket_player.get_rect())
