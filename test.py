@@ -85,9 +85,9 @@ class Racket (pygame.sprite.Sprite):
         
         elif(ball is not None):
             speed = ball.get_speed()
-            y = ball.get_rect().centery + .15*speed[Y] * time
-            self.rect.centery = y
-                        
+            # predicted position of the ball
+            y = ball.get_rect().centery + speed[Y] * time
+            self.rect.centery = (1 + .1)*y                        
 # ---------------------------------------------------------------------
 
 # Procedures
