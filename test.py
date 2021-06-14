@@ -1,5 +1,5 @@
 # Modules
-import sys
+import sys, enum
 import pygame
 from pygame.locals import *
 
@@ -12,6 +12,11 @@ Y = 1
 
 # Classes
 # ---------------------------------------------------------------------
+class Positions (enum.Enum):
+    LEFT = 0
+    RIGHT = 1
+    UP = 2
+    DOWN = 3
 class Ball (pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
@@ -19,10 +24,11 @@ class Ball (pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.centery = HEIGHT / 2
-        self.speed = [0.5, -0.5]
+        self.speed = [0.25, -0.25]
 
     def get_image (self): return self.image
     def get_rect (self): return self.rect
+    def speed_up (self, speed): self.speed = speed
 
     # updates the position of the ball on the screen
     def update (self, time):
@@ -36,6 +42,30 @@ class Ball (pygame.sprite.Sprite):
         if (self.rect.top <= 0 or self.rect.bottom >= HEIGHT):
             self.speed[Y] = -self.speed[Y]  # changes of y momentum component
             self.rect.centery += self.speed[Y] * time
+
+class Racket (pygame.sprite.Sprite):
+    def __init__(self, pos):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = load_image("images/racket.png", True)
+        self.rect = self.image.get_rect()
+        self.speed = .5
+
+        if (pos == Positions.LEFT):
+            self.rect.midleft = (0,HEIGHT/2)
+        elif (pos == Positions.RIGHT):
+            self.rect.midright = (WIDTH,HEIGHT/2)
+        else:
+            raise ("Error, position invalid")
+
+    def get_image (self): return self.image
+    def get_rect (self): return self.rect
+
+    def move (self, time, keys):
+        if (self.rect.top >= 0 and keys[K_UP]):
+            self.rect.centery -= self.speed * time
+        
+        if (self.rect.bottom <= HEIGHT and keys[K_DOWN]):
+            self.rect.centery += self.speed * time
 # ---------------------------------------------------------------------
 
 # Procedures
@@ -45,7 +75,7 @@ def load_image (filename, transparent=False):
     except pygame.error:
         raise SystemExit
 
-    image = image.convert_alpha()   # more suitable for .png images
+    image = image.convert_alpha()   # more suitable for png images
 
     if transparent:
         color = image.get_at((0,0))
@@ -67,6 +97,10 @@ def main():
     # creates the pong ball
     ball = Ball()
 
+    # creates the two rackets
+    racket_player = Racket(Positions.LEFT)
+    racket_cpu = Racket(Positions.RIGHT)
+
     while True:
         time = clock.tick(FRAMERATE)
 
@@ -74,9 +108,13 @@ def main():
             if event.type == QUIT:
                 sys.exit(0)
 
-        ball.update(time)   # updates the position of the ball
+        # updates the position of the sprites on the screen
+        ball.update(time)
+        racket_player.move(time, pygame.key.get_pressed())
         screen.blit(background_image, (0, 0))
         screen.blit(ball.get_image(), ball.get_rect())
+        screen.blit(racket_player.get_image(), racket_player.get_rect())
+        screen.blit(racket_cpu.get_image(), racket_cpu.get_rect())
         pygame.display.flip()
 
     return 0
