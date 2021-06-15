@@ -132,6 +132,28 @@ def load_image (filename, transparent=False):
         image.set_colorkey(color, RLEACCEL)
 
     return image
+
+def print_points (screen, player_points, cpu_points):
+    # sets the colors 
+    white = (255, 255, 255)
+    black = (0, 0, 0)
+
+    # sets the font used to print messages 
+    font = pygame.font.Font('freesansbold.ttf', 36)
+    text_1 = font.render(str(player_points), True, white, black)
+    text_2 = font.render(str(cpu_points), True, white, black)
+
+    # create a rectangular object for the
+    # text surface object
+    textRect_1 = text_1.get_rect()
+    textRect_2 = text_2.get_rect()
+ 
+    # set the center of the rectangular object.
+    textRect_1.center = (WIDTH/2 - 50, 50)
+    textRect_2.center = (WIDTH/2 + 50, 50)
+
+    screen.blit(text_1, textRect_1)
+    screen.blit(text_2, textRect_2)
 # ---------------------------------------------------------------------
 
 def main():
@@ -150,6 +172,9 @@ def main():
     racket_player = Racket(Positions.LEFT, .5)
     racket_cpu = Racket(Positions.RIGHT, .7)
 
+    # initalizes the scorers
+    player_points = cpu_points = 0
+
     while True:
         time = clock.tick(FRAMERATE)
 
@@ -162,12 +187,14 @@ def main():
         #ball.update(time, racket_cpu)
 
         if(ball.update(time, racket_player) == Positions.LEFT):
-            lose_message(screen, "You lose!")
-            pygame.display.flip()
+            cpu_points += 1
+            #lose_message(screen, "You lose!")
+            #pygame.display.flip()
 
         elif(ball.update(time, racket_cpu) == Positions.RIGHT):
-            lose_message(screen, "CPU loses!")
-            pygame.display.flip()
+            player_points += 1
+            #lose_message(screen, "CPU loses!")
+            #pygame.display.flip()
 
         else:
             racket_player.move(time, keys=get_pressed())
@@ -176,9 +203,9 @@ def main():
             screen.blit(ball.get_image(), ball.get_rect())
             screen.blit(racket_player.get_image(), racket_player.get_rect())
             screen.blit(racket_cpu.get_image(), racket_cpu.get_rect())
+            print_points(screen, player_points, cpu_points)
             pygame.display.flip()       
 
-    return 0
 
 if __name__ == '__main__':
     pygame.init()
