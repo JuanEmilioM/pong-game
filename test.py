@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import *
 from pygame.key import get_pressed
 from pygame.sprite import collide_rect
-from numpy.random import uniform
+from numpy.random import normal
 
 # Constants
 WIDTH = 640
@@ -12,6 +12,7 @@ HEIGHT = 480
 FRAMERATE = 60
 X = 0
 Y = 1
+POINTS_TO_WIN = 10
 
 # Classes
 # ---------------------------------------------------------------------
@@ -100,7 +101,7 @@ class Racket (pygame.sprite.Sprite):
 
 # Procedures
 # ---------------------------------------------------------------------
-def lose_message (screen, message):
+def winner_message (screen, message):
     # sets the colors 
     white = (255, 255, 255)
     green = (0, 255, 0)
@@ -109,7 +110,7 @@ def lose_message (screen, message):
 
     # sets the font used to print messages 
     font = pygame.font.Font('freesansbold.ttf', 36)
-    text = font.render(message, True, red, white)
+    text = font.render(message, True, green, white)
 
     # create a rectangular object for the
     # text surface object
@@ -165,47 +166,61 @@ def main():
     # creates a clock to control the game time
     clock = pygame.time.Clock()
 
-    # creates the pong ball
-    ball = Ball([.4, -.08])
-
-    # creates the two rackets
-    racket_player = Racket(Positions.LEFT, .5)
-    racket_cpu = Racket(Positions.RIGHT, .7)
-
     # initalizes the scorers
     player_points = cpu_points = 0
 
-    while True:
-        time = clock.tick(FRAMERATE)
+    # a flag to control if someone has won
+    winner = False
 
-        # checks if exit button was pressed
+    while not winner:
+        # creates the pong ball
+        ball = Ball([.4, -.08])
+
+        # creates the two rackets
+        racket_player = Racket(Positions.LEFT, .5)
+        racket_cpu = Racket(Positions.RIGHT, .7)
+        
+        while True:
+            time = clock.tick(FRAMERATE)
+
+            # checks if exit button was pressed
+            for event in pygame.event.get():
+                if event.type == QUIT:
+                    sys.exit(0)
+
+            if(ball.update(time, racket_player) == Positions.LEFT):
+                cpu_points += 1
+                break
+
+            elif(ball.update(time, racket_cpu) == Positions.RIGHT):
+                player_points += 1
+                break
+
+            else:
+                racket_player.move(time, keys=get_pressed())
+                racket_cpu.move(time, ball=ball)
+                screen.blit(background_image, (0, 0))
+                screen.blit(ball.get_image(), ball.get_rect())
+                screen.blit(racket_player.get_image(), racket_player.get_rect())
+                screen.blit(racket_cpu.get_image(), racket_cpu.get_rect())
+                print_points(screen, player_points, cpu_points)
+                pygame.display.flip()       
+
+        if (player_points == POINTS_TO_WIN):
+            winner_message(screen, "You won!")
+            winner = True
+
+        elif(cpu_points == POINTS_TO_WIN):
+            winner_message(screen, "CPU won!")
+            winner = True
+
+        pygame.display.flip()
+
+    # waits until the window is closed
+    while(True):
         for event in pygame.event.get():
             if event.type == QUIT:
                 sys.exit(0)
-
-        # updates the position of the sprites on the screen
-        #ball.update(time, racket_cpu)
-
-        if(ball.update(time, racket_player) == Positions.LEFT):
-            cpu_points += 1
-            #lose_message(screen, "You lose!")
-            #pygame.display.flip()
-
-        elif(ball.update(time, racket_cpu) == Positions.RIGHT):
-            player_points += 1
-            #lose_message(screen, "CPU loses!")
-            #pygame.display.flip()
-
-        else:
-            racket_player.move(time, keys=get_pressed())
-            racket_cpu.move(time, ball=ball)
-            screen.blit(background_image, (0, 0))
-            screen.blit(ball.get_image(), ball.get_rect())
-            screen.blit(racket_player.get_image(), racket_player.get_rect())
-            screen.blit(racket_cpu.get_image(), racket_cpu.get_rect())
-            print_points(screen, player_points, cpu_points)
-            pygame.display.flip()       
-
 
 if __name__ == '__main__':
     pygame.init()
