@@ -58,11 +58,11 @@ class Ball (pygame.sprite.Sprite):
         return Positions.NONE
 
 class Racket (pygame.sprite.Sprite):
-    def __init__(self, pos):
+    def __init__(self, pos, speed):
         pygame.sprite.Sprite.__init__(self)
         self.image = load_image("images/racket.png", True)
         self.rect = self.image.get_rect()
-        self.speed = .6
+        self.speed = speed
 
         if (pos == Positions.LEFT):
             self.rect.midleft = (0,HEIGHT/2)
@@ -84,9 +84,18 @@ class Racket (pygame.sprite.Sprite):
         
         elif(ball is not None):
             ball_speed = ball.get_speed()
+            ball_rect = ball.get_rect()
+            
+            if (ball_speed[X] >= 0 and ball_rect.centerx >= WIDTH/2):
+                if (self.rect.centery < ball_rect.centery):
+                    self.rect.centery += self.speed * time
+                if (self.rect.centery > ball_rect.centery):
+                    self.rect.centery -= self.speed * time
+
+            #ball_speed = ball.get_speed()
             # predicted position of the ball
-            y = ball.get_rect().centery + ball_speed[Y] * time
-            self.rect.centery = (1 - .1)*y
+            #y = ball.get_rect().centery + ball_speed[Y] * time
+            #self.rect.centery = (1 - .1)*y
 # ---------------------------------------------------------------------
 
 # Procedures
@@ -135,11 +144,11 @@ def main():
     clock = pygame.time.Clock()
 
     # creates the pong ball
-    ball = Ball([.2, -.1])
+    ball = Ball([.4, -.08])
 
     # creates the two rackets
-    racket_player = Racket(Positions.LEFT)
-    racket_cpu = Racket(Positions.RIGHT)
+    racket_player = Racket(Positions.LEFT, .5)
+    racket_cpu = Racket(Positions.RIGHT, .7)
 
     while True:
         time = clock.tick(FRAMERATE)
@@ -159,7 +168,7 @@ def main():
         elif(ball.update(time, racket_cpu) == Positions.RIGHT):
             lose_message(screen, "CPU loses!")
             pygame.display.flip()
-            
+
         else:
             racket_player.move(time, keys=get_pressed())
             racket_cpu.move(time, ball=ball)
