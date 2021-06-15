@@ -160,7 +160,7 @@ def print_points (screen, player_points, cpu_points):
 def main():
     # sets the main screen with its background image
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Test")
+    pygame.display.set_caption("Pong")
     background_image = load_image("images/fondo_pong.png")
 
     # creates a clock to control the game time
@@ -214,6 +214,7 @@ def main():
             winner_message(screen, "CPU won!")
             winner = True
 
+        print_points(screen, player_points, cpu_points)
         pygame.display.flip()
 
     # waits until the window is closed
