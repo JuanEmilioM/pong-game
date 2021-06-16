@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import *
 from pygame.key import get_pressed
 from pygame.sprite import collide_rect
-from numpy.random import normal
+from numpy.random import normal, randint
 
 # Constants
 WIDTH = 640
@@ -173,8 +173,11 @@ def main():
     winner = False
 
     while not winner:
-        # creates the pong ball
-        ball = Ball([.4, -.08])
+        # creates the pong ball with the given velocity vector
+        v_x = (-1)**randint(0,100) * normal(loc=.45, scale=.006)
+        v_y = (-1)**randint(0,100) * normal(loc=-.085, scale=.008)
+        #ball = Ball([.4, -.08])
+        ball = Ball([v_x, v_y])
 
         # creates the two rackets
         racket_player = Racket(Positions.LEFT, .5)
