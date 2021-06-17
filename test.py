@@ -57,7 +57,7 @@ class Ball (pygame.sprite.Sprite):
             self.rect.centerx += self.speed[X] * time
 
         return Positions.NONE
-
+        
 class Racket (pygame.sprite.Sprite):
     def __init__(self, pos, speed):
         pygame.sprite.Sprite.__init__(self)
@@ -92,11 +92,6 @@ class Racket (pygame.sprite.Sprite):
                     self.rect.centery += self.speed * time
                 if (self.rect.centery > ball_rect.centery):
                     self.rect.centery -= self.speed * time
-
-            #ball_speed = ball.get_speed()
-            # predicted position of the ball
-            #y = ball.get_rect().centery + ball_speed[Y] * time
-            #self.rect.centery = (1 - .1)*y
 # ---------------------------------------------------------------------
 
 # Procedures
@@ -176,7 +171,6 @@ def main():
         # creates the pong ball with the given velocity vector
         v_x = (-1)**randint(0,100) * normal(loc=.45, scale=.006)
         v_y = (-1)**randint(0,100) * normal(loc=-.085, scale=.008)
-        #ball = Ball([.4, -.08])
         ball = Ball([v_x, v_y])
 
         # creates the two rackets
