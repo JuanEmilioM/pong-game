@@ -26,7 +26,7 @@ class Positions (enum.Enum):
 class Ball (pygame.sprite.Sprite):
     def __init__(self, speed=[.25, -.25]):
         pygame.sprite.Sprite.__init__(self)
-        self.image = load_image("images/ball.png", True)
+        self.image = load_image("ball.png", True)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH / 2
         self.rect.centery = HEIGHT / 2
@@ -61,7 +61,7 @@ class Ball (pygame.sprite.Sprite):
 class Racket (pygame.sprite.Sprite):
     def __init__(self, pos, speed):
         pygame.sprite.Sprite.__init__(self)
-        self.image = load_image("images/racket.png", True)
+        self.image = load_image("racket.png", True)
         self.rect = self.image.get_rect()
         self.speed = speed
 
@@ -156,7 +156,7 @@ def main():
     # sets the main screen with its background image
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Pong")
-    background_image = load_image("images/fondo_pong.png")
+    background_image = load_image("fondo_pong.png")
 
     # creates a clock to control the game time
     clock = pygame.time.Clock()
